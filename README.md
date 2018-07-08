@@ -11,4 +11,4 @@
 
 ## Оценка (получение файла result.txt)
 
-Поместить файл **estimateResult.py** в папку **test**. Туда же скопировать **model.json** и **model.h5**. Принимает **model.json** и **model.h5** и аудиофайлы, лежащие в папке с утилитой. Производит **result.txt**.
+Поместить файл **estimateResult.py** в папку **test**. Туда же скопировать **model.json** и **model.h5**. Производит **result.txt**.
