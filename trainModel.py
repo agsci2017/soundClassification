@@ -12,7 +12,7 @@ import sys
 from sklearn.model_selection import train_test_split
 
 
-with open('snd_chromaA.pickle', 'rb') as f:
+with open('snd_chromaC.pickle', 'rb') as f:
 	data = pickle.load(f)
 print(data.head(8))
 
@@ -31,27 +31,27 @@ print(x_test.shape[0], 'test samples')
 
 
 def create_model():
-	v = Input(shape=(7,430,1,))
+	v = Input(shape=(12,489,1,))
 	vin = v
-	v = Conv2D(7,(7,7))(v)
-	v = Conv2D(7,(1,21))(v)
-	v = MaxPooling2D(pool_size = (1,21), strides=(1))(v)
+	v = Conv2D(12,(12,12))(v)
+	#v = Conv2D(7,(1,21))(v)
+	v = MaxPooling2D(pool_size = (1,36), strides=(1))(v)
 	
 	v = Flatten()(v)
 	
-	v = Dense(256, activation='relu')(v)
+	v = Dense(192, activation='elu')(v)
 	v = BatchNormalization()(v)
 	v = Dropout(0.2)(v)
 	
-	v = Dense(256, activation='relu')(v)
+	v = Dense(256, activation='elu')(v)
 	v = BatchNormalization()(v)
 	v = Dropout(0.2)(v)
 	
-	v = Dense(256, activation='relu')(v)
+	v = Dense(192, activation='elu')(v)
 	v = BatchNormalization()(v)
 	v = Dropout(0.2)(v)
 	
-	v = Dense(256, activation='relu')(v)
+	v = Dense(256, activation='elu')(v)
 	v = BatchNormalization()(v)
 	v = Dropout(0.2)(v)
 	
@@ -69,11 +69,11 @@ def create_model():
 
 model = create_model()
 
-model.fit(x_train.flatten().reshape((x_train.shape[0], 7,430,1)), y_train,
+model.fit(x_train.flatten().reshape((x_train.shape[0], 12,489,1)), y_train,
           batch_size=256,
-          epochs=60,
+          epochs=30,
           verbose=1,
-          validation_data=(x_test.flatten().reshape((x_test.shape[0], 7,430 ,1)), y_test))
+          validation_data=(x_test.flatten().reshape((x_test.shape[0], 12,489 ,1)), y_test))
 
 #~ sys.exit(0)
 
@@ -85,7 +85,7 @@ x_test = np.array(x_test)
 y_train = keras.utils.to_categorical(y_train, 8)
 y_test = keras.utils.to_categorical(y_test, 8)
 
-score = model.evaluate(x_train.flatten().reshape((x_train.shape[0], 7,430 ,1)), y_train, verbose=1)
+score = model.evaluate(x_train.flatten().reshape((x_train.shape[0], 12,489 ,1)), y_train, verbose=1)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1]) 
 
