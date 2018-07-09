@@ -19,20 +19,43 @@ model.load_weights("model.h5")
 print("Loaded model from disk")
 
 def multiply(arr):
-	while len(arr)<220000:
+	while len(arr)<250000:
 		arr=np.concatenate([arr,arr])
 		
-	return arr[:220000]
+	return arr[:250000]
 
 def tofeat(f):
 	y, sr = librosa.load(f)
-	y, idx = librosa.effects.trim(y,top_db=36)
+	#y, idx = librosa.effects.trim(y,top_db=36)
 	y=multiply(y)
-	S = librosa.feature.spectral_contrast(y=y, sr=sr)
-	print(S.shape)
-	r = S.flatten()
-	r = (r-min(r))/(max(r)-min(r))
-	return r
+	
+	S1 = librosa.feature.spectral_contrast(y=y, sr=sr)
+	from sklearn.preprocessing import scale
+	S1 = scale( S1 )
+	
+	#print(S1.shape)
+	S2 = librosa.feature.spectral_rolloff(y=y, sr=sr)
+	#print(S2.shape)
+	S2 = scale( S2 ,axis=1)
+	
+	S3 = librosa.feature.spectral_flatness(y=y)
+	#print(S3.shape)
+	S3 = scale( S3 ,axis=1)
+	
+	S4 = librosa.feature.spectral_bandwidth(y=y, sr=sr)
+	S4 = scale( S4 ,axis=1)
+	
+	S5 = librosa.feature.spectral_centroid(y=y, sr=sr)
+	S5 = scale( S5 ,axis=1)
+	
+	S6 = librosa.feature.rmse(y=y)
+	S6 = scale( S6 ,axis=1)
+	
+	SR = np.vstack([S5,S4,S2,S3,S1,S6])
+	
+	print(SR.shape)
+	
+	return SR.flatten()
 
 samples = []
 samples.append((0,"*.wav"))
@@ -58,8 +81,8 @@ for index, row in dt.iterrows():
 	
 	row['bsa'] = tofeat(row['name'])
 	
-	row['prob'] = np.array(model.predict(row['bsa'].reshape((1,7,430 ,1)))).flatten().max()
-	row['type'] = np.array(model.predict(row['bsa'].reshape((1,7,430 ,1)))).flatten().argmax()
+	row['prob'] = np.array(model.predict(row['bsa'].reshape((1,12,489 ,1)))).flatten().max()
+	row['type'] = np.array(model.predict(row['bsa'].reshape((1,12,489 ,1)))).flatten().argmax()
 	
 	dt.iloc[index] = row
 	
