@@ -4,7 +4,7 @@
 
 Установка необходимых модулей:
 
-1. `sudo pip3 install keras`
+`sudo pip3 install keras`
 
 По этапам:
 
