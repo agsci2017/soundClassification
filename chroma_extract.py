@@ -50,10 +50,10 @@ print(dt.head(5))
 
 def multiply(arr):
 	
-	while len(arr)<220000:
+	while len(arr)<250000:
 		arr=np.concatenate([arr,arr])
 		
-	return arr[:220000]
+	return arr[:250000]
 
 
 dt=dt.sample(frac=1)
@@ -65,25 +65,55 @@ for index, row in dt.iterrows():
 
 		y, sr = librosa.load(row['name'])
 		
-		y, idx = librosa.effects.trim(y,top_db=36)
+		#y, idx = librosa.effects.trim(y,top_db=40)
 
 		y=multiply(y)
 		
-		S = librosa.feature.spectral_contrast(y=y, sr=sr)
+		S1 = librosa.feature.spectral_contrast(y=y, sr=sr)
+		from sklearn.preprocessing import scale
+		S1 = scale( S1 )
 		
-		print(S.shape)
-
+		#print(S1.shape)
+		S2 = librosa.feature.spectral_rolloff(y=y, sr=sr)
+		#print(S2.shape)
+		S2 = scale( S2 ,axis=1)
+		
+		S3 = librosa.feature.spectral_flatness(y=y)
+		#print(S3.shape)
+		S3 = scale( S3 ,axis=1)
+		
+		S4 = librosa.feature.spectral_bandwidth(y=y, sr=sr)
+		S4 = scale( S4 ,axis=1)
+		
+		S5 = librosa.feature.spectral_centroid(y=y, sr=sr)
+		S5 = scale( S5 ,axis=1)
+		
+		S6 = librosa.feature.rmse(y=y)
+		S6 = scale( S6 ,axis=1)
+		
+		SR = np.vstack([S5,S4,S2,S3,S1,S6])
+		
+		print(SR.shape)
+		#~ librosa.display.specshow(SR)
+		#~ plt.show()
+		
+		#librosa.display.specshow(SR)
+		#plt.show()
 		y=None
 		
-		r = S.flatten()
-		r = (r-min(r))/(max(r)-min(r))
-
-		row['bsa'] = r
+		row['bsa'] = SR.flatten()
 		dt.iloc[index] = row
-		S=None
+		
+		SR=None
+		S1=None
+		S2=None
+		S3=None
+		S4=None
+		S5=None
+		S6=None
 
 		i+=1
 		print(i/float(dt.count()[2]))
-		
+	#break
 
 dt.to_pickle('snd_chromaA.pickle')
