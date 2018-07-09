@@ -12,7 +12,7 @@ import sys
 from sklearn.model_selection import train_test_split
 
 
-with open('snd_chromaC.pickle', 'rb') as f:
+with open('chroma.pickle', 'rb') as f:
 	data = pickle.load(f)
 print(data.head(8))
 
