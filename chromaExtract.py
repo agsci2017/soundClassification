@@ -116,4 +116,4 @@ for index, row in dt.iterrows():
 		print(i/float(dt.count()[2]))
 	#break
 
-dt.to_pickle('snd_chromC.pickle')
+dt.to_pickle('chroma.pickle')
